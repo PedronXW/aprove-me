@@ -1,0 +1,16 @@
+version: '3.9'
+
+services:
+
+  aprove-me-back:
+    build: .
+    container_name: aprove-me-back
+    restart: always
+    entrypoint: sleep infinity
+    ports: 
+      - 3333:3333
+    environment:
+      JWT_SECRET: secret
+      RESET_PASSWORD_SECRET: reset_password_secret
+    volumes:
+      - .:/app
