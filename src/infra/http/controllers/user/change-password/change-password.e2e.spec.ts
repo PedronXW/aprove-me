@@ -1,24 +1,43 @@
-import { app } from '@/infra/http/app'
-import request from 'supertest'
-import { createAuthenticatedUserOrganizer } from 'test/factories/e2e/authenticated-user'
+import { AppModule } from '@/infra/app.module'
+import { DatabaseModule } from '@/infra/database/database.module'
+import { INestApplication } from '@nestjs/common'
+import { Test } from '@nestjs/testing'
+import * as request from 'supertest'
 
 describe('Change Password', () => {
+  let app: INestApplication
+
+  beforeEach(async () => {
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule, DatabaseModule],
+      providers: [],
+    }).compile()
+
+    app = moduleRef.createNestApplication()
+
+    await app.init()
+  })
+
+  afterEach(async () => {
+    await app.close()
+  })
+
   it('should be able to change a user password', async () => {
-    await request(app).post('/users').send({
+    await request(app.getHttpServer()).post('/users').send({
       name: 'John Doe',
       email: 'johndoe@johndoe.com',
-      type: 'ORGANIZER',
       password: '12345678',
     })
 
-    const authentication = await request(app).post('/sessions').send({
-      email: 'johndoe@johndoe.com',
-      password: '12345678',
-    })
+    const authentication = await request(app.getHttpServer())
+      .post('/sessions')
+      .send({
+        email: 'johndoe@johndoe.com',
+        password: '12345678',
+      })
 
-    const responseUpdate = await request(app)
-      .put(`/users/password`)
-      .set('Content-Type', 'application/json')
+    const responseUpdate = await request(app.getHttpServer())
+      .patch(`/users/password`)
       .set('Authorization', `Bearer ${authentication.body.token}`)
       .send({
         password: '12345678',
@@ -29,20 +48,21 @@ describe('Change Password', () => {
   })
 
   it('should not be able to change a user password because a invalid password', async () => {
-    await request(app).post('/users').send({
+    await request(app.getHttpServer()).post('/users').send({
       name: 'John Doe',
       email: 'johndoe@johndoe.com',
-      type: 'ORGANIZER',
       password: '12345678',
     })
 
-    const authentication = await request(app).post('/sessions').send({
-      email: 'johndoe@johndoe.com',
-      password: '12345678',
-    })
+    const authentication = await request(app.getHttpServer())
+      .post('/sessions')
+      .send({
+        email: 'johndoe@johndoe.com',
+        password: '12345678',
+      })
 
-    const responseUpdate = await request(app)
-      .put(`/users/password`)
+    const responseUpdate = await request(app.getHttpServer())
+      .patch(`/users/password`)
       .set('Content-Type', 'application/json')
       .set('Authorization', `Bearer ${authentication.body.token}`)
       .send({
@@ -52,17 +72,28 @@ describe('Change Password', () => {
 
     expect(responseUpdate.status).toBe(400)
     expect(responseUpdate.body).toEqual({
-      error: ['password - String must contain at least 8 character(s)'],
+      errors: { name: 'ZodValidationError', details: expect.any(Object) },
+      message: 'Validation failed',
+      statusCode: 400,
     })
   })
 
   it('should not be able to change a user password because a wrong password', async () => {
-    const user = await createAuthenticatedUserOrganizer()
+    await request(app.getHttpServer()).post('/users').send({
+      name: 'John Doe',
+      email: 'johndoe@johndoe.com',
+      password: '12345678',
+    })
 
-    const responseUpdate = await request(app)
-      .put(`/users/password`)
+    const user = await request(app.getHttpServer()).post('/sessions').send({
+      email: 'johndoe@johndoe.com',
+      password: '12345678',
+    })
+
+    const responseUpdate = await request(app.getHttpServer())
+      .patch(`/users/password`)
       .set('Content-Type', 'application/json')
-      .set('Authorization', `Bearer ${user.authentication.body.token}`)
+      .set('Authorization', `Bearer ${user.body.token}`)
       .send({
         password: 'wrongpassword',
         newPassword: '123456789',
@@ -70,7 +101,9 @@ describe('Change Password', () => {
 
     expect(responseUpdate.status).toBe(400)
     expect(responseUpdate.body).toEqual({
-      error: 'Wrong credentials',
+      error: 'Bad Request',
+      message: 'Wrong credentials',
+      statusCode: 400,
     })
   })
 })

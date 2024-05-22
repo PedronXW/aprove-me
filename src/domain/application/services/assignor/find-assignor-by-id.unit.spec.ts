@@ -1,7 +1,7 @@
 import { EntityId } from '@/@shared/entities/entity-id'
 import { Assignor } from '@/domain/enterprise/entities/assignor'
 import { InMemoryAssignorRepository } from 'test/repositories/InMemoryAssignorRepository'
-import { AssignorNonExistsError } from '../../errors/AssignorNonExists'
+import { AssignorNonExistsError } from '../../errors/AssignorNonExistsError'
 import { FindAssignorByIdService } from './find-assignor-by-id'
 
 let sut: FindAssignorByIdService

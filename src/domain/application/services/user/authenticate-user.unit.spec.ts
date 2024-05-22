@@ -1,28 +1,32 @@
 import { InMemoryUserRepository } from '@/../test/repositories/InMemoryUserRepository'
 import { User } from '@/domain/enterprise/entities/user'
-import { Crypto } from '@/infra/cryptography/crypto'
-import { Encrypter } from '@/infra/cryptography/encrypter'
+import { FakeEncrypter } from 'test/cryptography/fake-encrypter'
+import { FakeHasher } from 'test/cryptography/fake-hasher'
 import { WrongCredentialError } from '../../errors/WrongCredentialsError'
 import { AuthenticateUserService } from './authenticate-user'
 
 let sut: AuthenticateUserService
 let inMemoryUserRepository: InMemoryUserRepository
-let crypto: Crypto
-let encrypter: Encrypter
+let fakeHasher: FakeHasher
+let fakeEncrypter: FakeEncrypter
 
 describe('AuthenticateUser', () => {
   beforeEach(() => {
     inMemoryUserRepository = new InMemoryUserRepository()
-    crypto = new Crypto()
-    encrypter = new Encrypter()
-    sut = new AuthenticateUserService(inMemoryUserRepository, crypto, encrypter)
+    fakeHasher = new FakeHasher()
+    fakeEncrypter = new FakeEncrypter()
+    sut = new AuthenticateUserService(
+      inMemoryUserRepository,
+      fakeHasher,
+      fakeEncrypter,
+    )
   })
 
   it('should be able to authenticate a user', async () => {
     const user = User.create({
       name: 'any_name',
       email: 'any_email@gmail.com',
-      password: await crypto.hash('any_password'),
+      password: await fakeHasher.hash('any_password'),
     })
 
     await inMemoryUserRepository.createUser(user)
@@ -41,7 +45,7 @@ describe('AuthenticateUser', () => {
     const user = User.create({
       name: 'any_name',
       email: 'any_email@gmail.com',
-      password: await crypto.hash('any_password'),
+      password: await fakeHasher.hash('any_password'),
     })
 
     await inMemoryUserRepository.createUser(user)
@@ -59,7 +63,7 @@ describe('AuthenticateUser', () => {
     const user = User.create({
       name: 'any_name',
       email: 'any_email@gmail.com',
-      password: await crypto.hash('any_password'),
+      password: await fakeHasher.hash('any_password'),
     })
 
     await inMemoryUserRepository.createUser(user)

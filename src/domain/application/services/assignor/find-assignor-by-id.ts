@@ -1,6 +1,6 @@
 import { Either, left, right } from '@/@shared/either'
 import { Assignor } from '@/domain/enterprise/entities/assignor'
-import { AssignorNonExistsError } from '../../errors/AssignorNonExists'
+import { AssignorNonExistsError } from '../../errors/AssignorNonExistsError'
 import { AssignorRepository } from '../../repositories/assignor-repository'
 
 type FindAssignorByIdServiceRequest = {

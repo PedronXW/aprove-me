@@ -1,23 +1,36 @@
+import { InactiveUserError } from '@/domain/application/errors/InactiveUserError'
+import { UserNonExistsError } from '@/domain/application/errors/UserNonExists'
 import { DeleteUserService } from '@/domain/application/services/user/delete-user'
-import { Response } from 'express'
-import { z } from 'zod'
+import { CurrentUser } from '@/infra/auth/current-user-decorator'
+import { UserPayload } from '@/infra/auth/jwt-strategy'
+import {
+  BadRequestException,
+  Controller,
+  Delete,
+  HttpCode,
+} from '@nestjs/common'
 
-const deleteUserZodSchema = z.object({
-  id: z.string().uuid(),
-})
-
+@Controller('/users')
 export class DeleteUserController {
   constructor(private deleteUserService: DeleteUserService) {}
 
-  async handle(req, res): Promise<Response> {
-    const { id } = deleteUserZodSchema.parse(req.user)
+  @Delete()
+  @HttpCode(204)
+  async handle(@CurrentUser() user: UserPayload) {
+    const { sub } = user
 
-    const user = await this.deleteUserService.execute({ id })
+    const result = await this.deleteUserService.execute({ id: sub })
 
-    if (user.isLeft()) {
-      return res.status(400).json({ error: user.value.message })
+    if (result.isLeft()) {
+      const error = result.value
+      switch (error.constructor) {
+        case UserNonExistsError:
+          throw new BadRequestException(error.message)
+        case InactiveUserError:
+          throw new BadRequestException(error.message)
+        default:
+          throw new BadRequestException(error.message)
+      }
     }
-
-    return res.status(204).json()
   }
 }

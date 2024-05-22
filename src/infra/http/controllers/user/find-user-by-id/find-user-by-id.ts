@@ -1,24 +1,30 @@
+import { UserNonExistsError } from '@/domain/application/errors/UserNonExists'
 import { FindUserByIdService } from '@/domain/application/services/user/find-user-by-id'
+import { CurrentUser } from '@/infra/auth/current-user-decorator'
+import { UserPayload } from '@/infra/auth/jwt-strategy'
 import { UserPresenter } from '@/infra/http/presenters/presenter-user'
-import { Response } from 'express'
-import { z } from 'zod'
+import { BadRequestException, Controller, Get } from '@nestjs/common'
 
-const findUserByIdZodSchema = z.object({
-  id: z.string().uuid(),
-})
-
+@Controller('users')
 export class FindUserByIdController {
   constructor(private readonly findUserByIdService: FindUserByIdService) {}
 
-  async handle(req, res): Promise<Response> {
-    const { id } = findUserByIdZodSchema.parse(req.user)
+  @Get()
+  async handle(@CurrentUser() user: UserPayload) {
+    const { sub } = user
 
-    const user = await this.findUserByIdService.execute({ id })
+    const receivedUser = await this.findUserByIdService.execute({ id: sub })
 
-    if (user.isLeft()) {
-      return res.status(400).send({ error: user.value.message })
+    if (receivedUser.isLeft()) {
+      const error = receivedUser.value
+      switch (error.constructor) {
+        case UserNonExistsError:
+          throw new BadRequestException(error.message)
+        default:
+          throw new BadRequestException(error.message)
+      }
     }
 
-    return res.status(200).send({ user: UserPresenter.toHTTP(user.value) })
+    return { user: UserPresenter.toHTTP(receivedUser.value) }
   }
 }

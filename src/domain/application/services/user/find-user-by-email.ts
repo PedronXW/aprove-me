@@ -1,5 +1,6 @@
 import { Either, left, right } from '@/@shared/either'
 import { User } from '@/domain/enterprise/entities/user'
+import { Injectable } from '@nestjs/common'
 import { UserNonExistsError } from '../../errors/UserNonExists'
 import { UserRepository } from '../../repositories/user-repository'
 
@@ -9,6 +10,7 @@ type FindUserByEmailServiceRequest = {
 
 type FindUserByEmailServiceResponse = Either<UserNonExistsError, User>
 
+@Injectable()
 export class FindUserByEmailService {
   constructor(private userRepository: UserRepository) {}
 

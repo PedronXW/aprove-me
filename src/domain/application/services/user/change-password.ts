@@ -1,13 +1,19 @@
 import { Either, left, right } from '@/@shared/either'
 import { User } from '@/domain/enterprise/entities/user'
+import { Injectable } from '@nestjs/common'
 import { HashComparer } from '../../criptography/hash-comparer'
 import { HashGenerator } from '../../criptography/hash-generator'
+import { InactiveUserError } from '../../errors/InactiveUserError'
 import { UserNonExistsError } from '../../errors/UserNonExists'
 import { WrongCredentialError } from '../../errors/WrongCredentialsError'
 import { UserRepository } from '../../repositories/user-repository'
 
-type ChangePasswordServiceResponse = Either<UserNonExistsError, User>
+type ChangePasswordServiceResponse = Either<
+  UserNonExistsError | WrongCredentialError | InactiveUserError,
+  User
+>
 
+@Injectable()
 export class ChangePasswordService {
   constructor(
     private readonly userRepository: UserRepository,
@@ -24,6 +30,10 @@ export class ChangePasswordService {
 
     if (!user) {
       return left(new UserNonExistsError())
+    }
+
+    if (user.active === false) {
+      return left(new InactiveUserError())
     }
 
     const passwordMatch = await this.hashComparer.compare(

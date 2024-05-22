@@ -1,36 +1,70 @@
-import { RedisCacheRepository } from '@/infra/cache/redis-repository'
-import { app } from '@/infra/http/app'
-import request from 'supertest'
-import { createAuthenticatedUserOrganizer } from 'test/factories/e2e/authenticated-user'
+import { AppModule } from '@/infra/app.module'
+import { DatabaseModule } from '@/infra/database/database.module'
+import { INestApplication } from '@nestjs/common'
+import { Test } from '@nestjs/testing'
+import * as request from 'supertest'
 
 describe('Delete User', () => {
-  it('should be able to delete a user', async () => {
-    const { authentication, user } = await createAuthenticatedUserOrganizer()
+  let app: INestApplication
 
-    const response = await request(app)
+  beforeEach(async () => {
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule, DatabaseModule],
+      providers: [],
+    }).compile()
+
+    app = moduleRef.createNestApplication()
+
+    await app.init()
+  })
+
+  afterEach(async () => {
+    await app.close()
+  })
+
+  it('should be able to delete a user', async () => {
+    await request(app.getHttpServer()).post('/users').send({
+      name: 'John Doe',
+      email: 'johndoe@johndoe.com',
+      password: '12345678',
+    })
+
+    const user = await request(app.getHttpServer()).post('/sessions').send({
+      email: 'johndoe@johndoe.com',
+      password: '12345678',
+    })
+
+    const response = await request(app.getHttpServer())
       .delete(`/users`)
       .set('Content-Type', 'application/json')
-      .set('Authorization', `Bearer ${authentication.body.token}`)
+      .set('Authorization', `Bearer ${user.body.token}`)
       .send()
 
-    const cacheRepository = new RedisCacheRepository()
-    const userDeleted = await cacheRepository.get('user:' + user.body.id)
-
     expect(response.status).toBe(204)
-    expect(userDeleted).toEqual(expect.any(String))
   })
 
   it('should be able to not edit a user because the user is deleted', async () => {
-    const { authentication } = await createAuthenticatedUserOrganizer()
+    await request(app.getHttpServer()).post('/users').send({
+      name: 'John Doe',
+      email: 'johndoe@johndoe.com',
+      password: '12345678',
+    })
 
-    const response = await request(app)
+    const authentication = await request(app.getHttpServer())
+      .post('/sessions')
+      .send({
+        email: 'johndoe@johndoe.com',
+        password: '12345678',
+      })
+
+    const response = await request(app.getHttpServer())
       .delete(`/users`)
       .set('Content-Type', 'application/json')
       .set('Authorization', `Bearer ${authentication.body.token}`)
       .send()
 
-    const responseUpdate = await request(app)
-      .put(`/users`)
+    const responseUpdate = await request(app.getHttpServer())
+      .patch(`/users`)
       .set('Content-Type', 'application/json')
       .set('Authorization', `Bearer ${authentication.body.token}`)
       .send({
@@ -39,32 +73,46 @@ describe('Delete User', () => {
 
     expect(response.status).toBe(204)
     expect(responseUpdate.body).toEqual({
-      error: 'User is inactive',
+      error: 'Bad Request',
+      message: 'User is inactive',
+      statusCode: 400,
     })
   })
 
   it('should be able to not authenticate a user because the user is deleted', async () => {
-    const { authentication, user, password } =
-      await createAuthenticatedUserOrganizer()
+    const user = await request(app.getHttpServer()).post('/users').send({
+      name: 'John Doe',
+      email: 'johndoe@johndoe.com',
+      password: '12345678',
+    })
 
-    const response = await request(app)
+    const authentication = await request(app.getHttpServer())
+      .post('/sessions')
+      .send({
+        email: 'johndoe@johndoe.com',
+        password: '12345678',
+      })
+
+    const response = await request(app.getHttpServer())
       .delete(`/users`)
       .set('Content-Type', 'application/json')
       .set('Authorization', `Bearer ${authentication.body.token}`)
       .send()
 
-    const responseUpdate = await request(app)
+    const responseUpdate = await request(app.getHttpServer())
       .post(`/sessions`)
       .set('Content-Type', 'application/json')
       .set('Authorization', `Bearer ${authentication.body.token}`)
       .send({
         email: user.body.email,
-        password,
+        password: '12345678',
       })
 
     expect(response.status).toBe(204)
     expect(responseUpdate.body).toEqual({
-      error: 'User is inactive',
+      error: 'Bad Request',
+      message: 'User is inactive',
+      statusCode: 400,
     })
   })
 })

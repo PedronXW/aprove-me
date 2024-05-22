@@ -1,32 +1,46 @@
+import { UserAlreadyExistsError } from '@/domain/application/errors/UserAlreadyExistsError'
 import { CreateUserService } from '@/domain/application/services/user/create-user'
+import { Public } from '@/infra/auth/public'
+import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation-pipe'
 import { UserPresenter } from '@/infra/http/presenters/presenter-user'
-import { Response } from 'express'
+import { BadRequestException, Body, Controller, Post } from '@nestjs/common'
 import { z } from 'zod'
 
-const createUserZodSchema = z.object({
+const createUserDTO = z.object({
   name: z.string().min(2),
   email: z.string().email(),
-  type: z.enum(['ORGANIZER', 'PARTICIPANT']),
   password: z.string().min(8),
 })
 
+export type CreateUserDTO = z.infer<typeof createUserDTO>
+
+const bodyValidation = new ZodValidationPipe(createUserDTO)
+
+@Public()
+@Controller('/users')
 export class CreateUserController {
   constructor(private createUserService: CreateUserService) {}
 
-  async handle(req, res): Promise<Response> {
-    const { name, email, password, type } = createUserZodSchema.parse(req.body)
+  @Post()
+  async handle(@Body(bodyValidation) body: CreateUserDTO) {
+    const { name, email, password } = body
 
     const user = await this.createUserService.execute({
       name,
       email,
-      type,
       password,
     })
 
     if (user.isLeft()) {
-      return res.status(400).json({ error: user.value.message })
+      const error = user.value
+      switch (error.constructor) {
+        case UserAlreadyExistsError:
+          throw new BadRequestException(error.message)
+        default:
+          throw new BadRequestException(error.message)
+      }
     }
 
-    return res.status(201).json(UserPresenter.toHTTP(user.value))
+    return UserPresenter.toHTTP(user.value)
   }
 }

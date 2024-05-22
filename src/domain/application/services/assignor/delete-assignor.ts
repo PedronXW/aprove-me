@@ -1,5 +1,6 @@
 import { Either, left, right } from '@/@shared/either'
-import { AssignorNonExistsError } from '../../errors/AssignorNonExists'
+import { AssignorNonExistsError } from '../../errors/AssignorNonExistsError'
+import { InactiveAssignorError } from '../../errors/InactiveAssignorError'
 import { AssignorRepository } from '../../repositories/assignor-repository'
 
 type DeleteAssignorServiceRequest = {
@@ -23,6 +24,10 @@ export class DeleteAssignorService {
 
     if (!assignor) {
       return left(new AssignorNonExistsError())
+    }
+
+    if (!assignor.active) {
+      return left(new InactiveAssignorError())
     }
 
     const result = await this.assignorRepository.deleteAssignor(id)

@@ -1,4 +1,5 @@
 import { Either, left, right } from '@/@shared/either'
+import { Injectable } from '@nestjs/common'
 import { Encrypter } from '../../criptography/encrypter'
 import { HashComparer } from '../../criptography/hash-comparer'
 import { InactiveUserError } from '../../errors/InactiveUserError'
@@ -15,6 +16,7 @@ type AuthenticateUserServiceResponse = Either<
   { token: string }
 >
 
+@Injectable()
 export class AuthenticateUserService {
   constructor(
     private userRepository: UserRepository,
@@ -46,7 +48,7 @@ export class AuthenticateUserService {
     }
 
     const token = await this.encrypter.encrypt({
-      id: user.id.getValue(),
+      sub: user.id.getValue(),
     })
 
     return right({ token })

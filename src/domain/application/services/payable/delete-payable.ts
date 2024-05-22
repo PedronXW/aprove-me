@@ -1,4 +1,5 @@
 import { Either, left, right } from '@/@shared/either'
+import { InactivePayableError } from '../../errors/InactivePayableError'
 import { PayableNonExistsError } from '../../errors/PayableNonExists'
 import { PayableRepository } from '../../repositories/payable-repository'
 
@@ -7,7 +8,10 @@ type DeletePayableServiceRequest = {
   receiverId: string
 }
 
-type DeletePayableServiceResponse = Either<PayableNonExistsError, boolean>
+type DeletePayableServiceResponse = Either<
+  PayableNonExistsError | InactivePayableError,
+  boolean
+>
 
 export class DeletePayableService {
   constructor(private payableRepository: PayableRepository) {}
@@ -20,6 +24,10 @@ export class DeletePayableService {
 
     if (!payable) {
       return left(new PayableNonExistsError())
+    }
+
+    if (!payable.active) {
+      return left(new InactivePayableError())
     }
 
     const result = await this.payableRepository.deletePayable(id)

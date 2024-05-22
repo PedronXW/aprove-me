@@ -1,41 +1,53 @@
+import { UserNonExistsError } from '@/domain/application/errors/UserNonExists'
+import { WrongCredentialError } from '@/domain/application/errors/WrongCredentialsError'
 import { ChangePasswordService } from '@/domain/application/services/user/change-password'
+import { CurrentUser } from '@/infra/auth/current-user-decorator'
+import { UserPayload } from '@/infra/auth/jwt-strategy'
+import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation-pipe'
 import { UserPresenter } from '@/infra/http/presenters/presenter-user'
-import { Response } from 'express'
+import { BadRequestException, Body, Controller, Patch } from '@nestjs/common'
 import { z } from 'zod'
 
-const changePasswordZodBodySchema = z.object({
+const changePasswordDTO = z.object({
   password: z.string().min(8),
   newPassword: z.string().min(8),
 })
 
-export type ChangePasswordBodySchema = z.infer<
-  typeof changePasswordZodBodySchema
->
+export type ChangePasswordDTO = z.infer<typeof changePasswordDTO>
 
-const changePasswordZodParamsSchema = z.object({
-  id: z.string().uuid(),
-})
+const bodyValidation = new ZodValidationPipe(changePasswordDTO)
 
+@Controller('/users/password')
 export class ChangePasswordController {
   constructor(private readonly changePasswordService: ChangePasswordService) {}
 
-  async handle(req, res): Promise<Response> {
-    const { id } = changePasswordZodParamsSchema.parse(req.user)
+  @Patch()
+  async handle(
+    @Body(bodyValidation) body: ChangePasswordDTO,
+    @CurrentUser() user: UserPayload,
+  ) {
+    const { sub } = user
 
-    const { password, newPassword } = changePasswordZodBodySchema.parse(
-      req.body,
-    )
+    const { password, newPassword } = body
 
     const editedUser = await this.changePasswordService.execute(
-      id,
+      sub,
       password,
       newPassword,
     )
 
     if (editedUser.isLeft()) {
-      return res.status(400).send({ error: editedUser.value.message })
+      const error = editedUser.value
+      switch (error.constructor) {
+        case WrongCredentialError:
+          throw new BadRequestException(error.message)
+        case UserNonExistsError:
+          throw new BadRequestException(error.message)
+        default:
+          throw new BadRequestException(error.message)
+      }
     }
 
-    return res.status(200).send(UserPresenter.toHTTP(editedUser.value))
+    return UserPresenter.toHTTP(editedUser.value)
   }
 }

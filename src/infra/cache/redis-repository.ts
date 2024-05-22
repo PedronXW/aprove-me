@@ -1,22 +1,20 @@
 import { CacheRepository } from '@/domain/application/cache/cache-repository'
-import { createRedisInstance, quitRedisInstance } from './redis-instance'
+import { Injectable } from '@nestjs/common'
+import { RedisService } from './redis.service'
 
+@Injectable()
 export class RedisCacheRepository implements CacheRepository {
+  constructor(private redis: RedisService) {}
+
   async set(key: string, value: string): Promise<void> {
-    const redis = createRedisInstance()
-
-    await redis.set(key, value, 'EX', 60 * 60 * 2) // 2 hours
-
-    quitRedisInstance(redis)
+    await this.redis.set(key, value, 'EX', 60 * 15)
   }
 
-  async get(key: string): Promise<string | null> {
-    const redis = createRedisInstance()
+  get(key: string): Promise<string | null> {
+    return this.redis.get(key)
+  }
 
-    const value = await redis.get(key)
-
-    quitRedisInstance(redis)
-
-    return value
+  async delete(key: string): Promise<void> {
+    await this.redis.del(key)
   }
 }

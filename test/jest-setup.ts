@@ -1,4 +1,3 @@
-import { env } from '@/infra/env'
 import { PrismaClient } from '@prisma/client'
 import { execSync } from 'child_process'
 import { randomInt } from 'crypto'
@@ -13,22 +12,23 @@ if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL is not set')
 }
 
-const schemaId = randomInt(999999999).toString()
-
-function generateUniqueDatabaseURL(schemaId: string) {
-  const url = new URL(process.env.DATABASE_URL!)
-  url.searchParams.set('schema', schemaId)
+function generateUniqueDatabaseURL(dbId: string) {
+  const url = 'file:./test.' + dbId + '.db'
   return url.toString()
 }
 
 const redis = new Redis({
-  host: env.REDIS_HOST,
-  port: Number(env.REDIS_PORT),
+  host: process.env.REDIS_HOST,
+  port: Number(process.env.REDIS_PORT),
   db: Number(9),
 })
 
 beforeEach(async () => {
-  const databaseURL = generateUniqueDatabaseURL(schemaId)
+  const dbId = randomInt(999999999).toString()
+
+  const databaseURL = generateUniqueDatabaseURL(dbId)
+
+  process.env.TEST_DATABASE_ID = dbId
 
   process.env.DATABASE_URL = databaseURL
 
@@ -38,7 +38,10 @@ beforeEach(async () => {
 })
 
 afterEach(async () => {
-  await prisma.$executeRawUnsafe(`DROP SCHEMA IF EXISTS "${schemaId}" CASCADE`)
+  execSync(
+    `cd prisma && rm -rf test.${process.env.TEST_DATABASE_ID}.db-journal && rm -rf test.${process.env.TEST_DATABASE_ID}.db && cd ..`,
+  )
+
   await prisma.$disconnect()
 })
 

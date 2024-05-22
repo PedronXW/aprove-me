@@ -1,26 +1,30 @@
 import { InMemoryUserRepository } from '@/../test/repositories/InMemoryUserRepository'
 import { User } from '@/domain/enterprise/entities/user'
-import { Crypto } from '@/infra/cryptography/crypto'
+import { FakeHasher } from 'test/cryptography/fake-hasher'
 import { UserNonExistsError } from '../../errors/UserNonExists'
 import { WrongCredentialError } from '../../errors/WrongCredentialsError'
 import { ChangePasswordService } from './change-password'
 
 let sut: ChangePasswordService
 let inMemoryUserRepository: InMemoryUserRepository
-let crypto: Crypto
+let fakeHasher: FakeHasher
 
 describe('ChangePassword', () => {
   beforeEach(() => {
     inMemoryUserRepository = new InMemoryUserRepository()
-    crypto = new Crypto()
-    sut = new ChangePasswordService(inMemoryUserRepository, crypto, crypto)
+    fakeHasher = new FakeHasher()
+    sut = new ChangePasswordService(
+      inMemoryUserRepository,
+      fakeHasher,
+      fakeHasher,
+    )
   })
 
   it('should be able to change a user password', async () => {
     const user = User.create({
       name: 'any_name',
       email: 'any_email@gmail.com',
-      password: await crypto.hash('any_password'),
+      password: await fakeHasher.hash('any_password'),
     })
 
     await inMemoryUserRepository.createUser(user)
@@ -33,7 +37,7 @@ describe('ChangePassword', () => {
 
     expect(result.isRight()).toBe(true)
     expect(
-      await crypto.compare(
+      await fakeHasher.compare(
         'new_password',
         inMemoryUserRepository.users[0].password!.toString(),
       ),
@@ -44,7 +48,7 @@ describe('ChangePassword', () => {
     const user = User.create({
       name: 'any_name',
       email: 'any_email@gmail.com',
-      password: await crypto.hash('any_password'),
+      password: await fakeHasher.hash('any_password'),
     })
 
     await inMemoryUserRepository.createUser(user)

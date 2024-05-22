@@ -1,7 +1,7 @@
 import { InMemoryAssignorRepository } from '@/../test/repositories/InMemoryAssignorRepository'
 import { EntityId } from '@/@shared/entities/entity-id'
 import { Assignor } from '@/domain/enterprise/entities/assignor'
-import { AssignorNonExistsError } from '../../errors/AssignorNonExists'
+import { AssignorNonExistsError } from '../../errors/AssignorNonExistsError'
 import { UpdateAssignorService } from './update-assignor'
 
 let sut: UpdateAssignorService

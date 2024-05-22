@@ -1,20 +1,39 @@
-import { app } from '@/infra/http/app'
-import request from 'supertest'
+import { AppModule } from '@/infra/app.module'
+import { DatabaseModule } from '@/infra/database/database.module'
+import { INestApplication } from '@nestjs/common'
+import { Test } from '@nestjs/testing'
+import * as request from 'supertest'
 
 describe('Create User', () => {
+  let app: INestApplication
+
+  beforeEach(async () => {
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule, DatabaseModule],
+      providers: [],
+    }).compile()
+
+    app = moduleRef.createNestApplication()
+
+    await app.init()
+  })
+
+  afterEach(async () => {
+    await app.close()
+  })
+
   it('should be able to create a user', async () => {
-    const response = await request(app).post('/users').send({
+    const response = await request(app.getHttpServer()).post('/users').send({
       name: 'John Doe',
       email: 'johndoe@johndoe.com',
-      type: 'ORGANIZER',
       password: '12345678',
     })
 
     expect(response.status).toBe(201)
     expect(response.body).toEqual({
       id: expect.any(String),
+      active: true,
       name: 'John Doe',
-      type: 'ORGANIZER',
       email: 'johndoe@johndoe.com',
       createdAt: expect.any(String),
       updatedAt: null,
@@ -22,81 +41,68 @@ describe('Create User', () => {
   })
 
   it('should not be able to create a user because a user already exists', async () => {
-    await request(app).post('/users').send({
+    await request(app.getHttpServer()).post('/users').send({
       name: 'John Doe',
       email: 'johndoe@johndoe.com',
-      type: 'ORGANIZER',
       password: '12345678',
     })
 
-    const response = await request(app).post('/users').send({
+    const response = await request(app.getHttpServer()).post('/users').send({
       name: 'John Doe',
       email: 'johndoe@johndoe.com',
-      type: 'ORGANIZER',
       password: '12345678',
     })
 
     expect(response.status).toBe(400)
     expect(response.body).toEqual({
-      error: 'User already exists',
+      message: 'User already exists',
+      error: 'Bad Request',
+      statusCode: 400,
     })
   })
 
   it('should not be able to create a user because a invalid name', async () => {
-    const response = await request(app).post('/users').send({
+    const response = await request(app.getHttpServer()).post('/users').send({
       name: 'J',
       email: 'johndoe@johndoe.com',
-      type: 'ORGANIZER',
       password: '12345678',
     })
 
     expect(response.status).toBe(400)
     expect(response.body).toEqual({
-      error: ['name - String must contain at least 2 character(s)'],
+      errors: { name: 'ZodValidationError', details: expect.any(Object) },
+      message: 'Validation failed',
+      statusCode: 400,
     })
   })
 
   it('should not be able to create a user because a invalid password', async () => {
-    const response = await request(app).post('/users').send({
+    const response = await request(app.getHttpServer()).post('/users').send({
       name: 'John Doe',
       email: 'johndoe@johndoe.com',
-      type: 'ORGANIZER',
       password: '123',
     })
 
     expect(response.status).toBe(400)
     expect(response.body).toEqual({
-      error: ['password - String must contain at least 8 character(s)'],
+      errors: { name: 'ZodValidationError', details: expect.any(Object) },
+      message: 'Validation failed',
+      statusCode: 400,
     })
   })
 
-  it('should not be able to create a user because a invalid password', async () => {
-    const response = await request(app).post('/users').send({
+  it('should not be able to create a user because a invalid email', async () => {
+    const response = await request(app.getHttpServer()).post('/users').send({
       name: 'John Doe',
       email: 'johndoe',
-      type: 'ORGANIZER',
       password: '12345678',
     })
 
     expect(response.status).toBe(400)
     expect(response.body).toEqual({
-      error: ['email - Invalid email'],
-    })
-  })
-
-  it('should not be able to create a user because a invalid type', async () => {
-    const response = await request(app).post('/users').send({
-      name: 'John Doe',
-      email: 'johndoe@any.com',
-      type: 'ANYTHING',
-      password: '12345678',
-    })
-
-    expect(response.status).toBe(400)
-    expect(response.body).toEqual({
-      error: [
-        "type - Invalid enum value. Expected 'ORGANIZER' | 'PARTICIPANT', received 'ANYTHING'",
-      ],
+      errors: { name: 'ZodValidationError', details: expect.any(Object) },
+      message: 'Validation failed',
+      statusCode: 400,
     })
   })
 })

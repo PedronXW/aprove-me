@@ -1,5 +1,6 @@
 import { Either, left, right } from '@/@shared/either'
 import { User } from '@/domain/enterprise/entities/user'
+import { Injectable } from '@nestjs/common'
 import { HashGenerator } from '../../criptography/hash-generator'
 import { UserAlreadyExistsError } from '../../errors/UserAlreadyExistsError'
 import { UserRepository } from '../../repositories/user-repository'
@@ -12,6 +13,7 @@ interface CreateUserServiceRequest {
 
 type CreateUserServiceResponse = Either<UserAlreadyExistsError, User>
 
+@Injectable()
 export class CreateUserService {
   constructor(
     private userRepository: UserRepository,

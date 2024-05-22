@@ -1,18 +1,18 @@
 import { InMemoryUserRepository } from '@/../test/repositories/InMemoryUserRepository'
 import { User } from '@/domain/enterprise/entities/user'
-import { Crypto } from '@/infra/cryptography/crypto'
+import { FakeHasher } from 'test/cryptography/fake-hasher'
 import { UserAlreadyExistsError } from '../../errors/UserAlreadyExistsError'
 import { CreateUserService } from './create-user'
 
 let sut: CreateUserService
 let inMemoryUserRepository: InMemoryUserRepository
-let crypto: Crypto
+let fakeHasher: FakeHasher
 
 describe('CreateUser', () => {
   beforeEach(() => {
     inMemoryUserRepository = new InMemoryUserRepository()
-    crypto = new Crypto()
-    sut = new CreateUserService(inMemoryUserRepository, crypto)
+    fakeHasher = new FakeHasher()
+    sut = new CreateUserService(inMemoryUserRepository, fakeHasher)
   })
 
   it('should be able to create a user', async () => {
