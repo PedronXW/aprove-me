@@ -14,10 +14,10 @@ import {
 import { z } from 'zod'
 
 const updateAssignorDTO = z.object({
-  name: z.string().min(2).max(140),
-  email: z.string().email().max(140),
-  document: z.string().max(30),
-  phone: z.string().max(20),
+  name: z.string().min(2).max(140).optional(),
+  email: z.string().email().max(140).optional(),
+  document: z.string().max(30).optional(),
+  phone: z.string().max(20).optional(),
 })
 
 export type UpdateAssignorDTO = z.infer<typeof updateAssignorDTO>

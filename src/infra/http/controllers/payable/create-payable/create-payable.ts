@@ -12,7 +12,6 @@ import { z } from 'zod'
 
 const createPayableDTO = z.object({
   value: z.number(),
-  emissionDate: z.date(),
   assignorId: z.string().uuid(),
 })
 
@@ -29,13 +28,12 @@ export class CreatePayableController {
     @Body(bodyValidation) body: CreatePayableDTO,
     @CurrentUser() user: UserPayload,
   ) {
-    const { assignorId, emissionDate, value } = body
+    const { assignorId, value } = body
 
     const { sub } = user
 
     const payable = await this.createPayableService.execute({
       assignorId,
-      emissionDate,
       receiverId: sub,
       value,
     })

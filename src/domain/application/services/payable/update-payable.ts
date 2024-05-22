@@ -1,6 +1,7 @@
 import { Either, left, right } from '@/@shared/either'
 import { EntityId } from '@/@shared/entities/entity-id'
 import { Payable } from '@/domain/enterprise/entities/payable'
+import { Injectable } from '@nestjs/common'
 import { PayableNonExistsError } from '../../errors/PayableNonExists'
 import { PayableRepository } from '../../repositories/payable-repository'
 
@@ -14,6 +15,7 @@ type UpdatePayableServiceRequest = {
 
 type UpdatePayableServiceResponse = Either<PayableNonExistsError, Payable>
 
+@Injectable()
 export class UpdatePayableService {
   constructor(private payableRepository: PayableRepository) {}
 

@@ -1,4 +1,5 @@
 import { Either, left, right } from '@/@shared/either'
+import { Injectable } from '@nestjs/common'
 import { AssignorNonExistsError } from '../../errors/AssignorNonExistsError'
 import { InactiveAssignorError } from '../../errors/InactiveAssignorError'
 import { AssignorRepository } from '../../repositories/assignor-repository'
@@ -10,6 +11,7 @@ type DeleteAssignorServiceRequest = {
 
 type DeleteAssignorServiceResponse = Either<AssignorNonExistsError, boolean>
 
+@Injectable()
 export class DeleteAssignorService {
   constructor(private assignorRepository: AssignorRepository) {}
 

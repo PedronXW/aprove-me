@@ -61,12 +61,13 @@ export class Payable extends Entity<PayableProps> {
   }
 
   static create(
-    props: Optional<PayableProps, 'received' | 'active'>,
+    props: Optional<PayableProps, 'received' | 'active' | 'emissionDate'>,
     id?: EntityId,
   ): Payable {
     const payable = new Payable(
       {
         ...props,
+        emissionDate: props.emissionDate ?? new Date(),
         received: props.received ?? false,
         active: props.active ?? true,
       },

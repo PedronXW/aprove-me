@@ -1,4 +1,5 @@
 import { Either, left, right } from '@/@shared/either'
+import { Injectable } from '@nestjs/common'
 import { PaginationError } from '../../errors/PaginationError'
 import {
   FindPayablesResponse,
@@ -13,6 +14,7 @@ type FindPayablesServiceRequest = {
 
 type FindPayablesServiceResponse = Either<PaginationError, FindPayablesResponse>
 
+@Injectable()
 export class FindPayablesService {
   constructor(private payableRepository: PayableRepository) {}
 

@@ -1,6 +1,7 @@
 import { Either, right } from '@/@shared/either'
 import { EntityId } from '@/@shared/entities/entity-id'
 import { Assignor } from '@/domain/enterprise/entities/assignor'
+import { Injectable } from '@nestjs/common'
 import { AssignorRepository } from '../../repositories/assignor-repository'
 
 export type CreateAssignorServiceRequest = {
@@ -13,6 +14,7 @@ export type CreateAssignorServiceRequest = {
 
 export type CreateAssignorServiceResponse = Either<Error, Assignor>
 
+@Injectable()
 export class CreateAssignorService {
   constructor(private readonly AssignorRepository: AssignorRepository) {}
 

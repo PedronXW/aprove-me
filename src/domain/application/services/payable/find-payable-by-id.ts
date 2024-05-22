@@ -1,5 +1,6 @@
 import { Either, left, right } from '@/@shared/either'
 import { Payable } from '@/domain/enterprise/entities/payable'
+import { Injectable } from '@nestjs/common'
 import { PayableNonExistsError } from '../../errors/PayableNonExists'
 import { PayableRepository } from '../../repositories/payable-repository'
 
@@ -10,6 +11,7 @@ type FindPayableByIdServiceRequest = {
 
 type FindPayableByIdServiceResponse = Either<PayableNonExistsError, Payable>
 
+@Injectable()
 export class FindPayableByIdService {
   constructor(private payableRepository: PayableRepository) {}
 

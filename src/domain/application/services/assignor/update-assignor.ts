@@ -1,5 +1,6 @@
 import { Either, left, right } from '@/@shared/either'
 import { Assignor } from '@/domain/enterprise/entities/assignor'
+import { Injectable } from '@nestjs/common'
 import { AssignorNonExistsError } from '../../errors/AssignorNonExistsError'
 import { AssignorRepository } from '../../repositories/assignor-repository'
 
@@ -14,6 +15,7 @@ type EditAssignorServiceRequest = {
 
 type UpdateAssignorServiceResponse = Either<AssignorNonExistsError, Assignor>
 
+@Injectable()
 export class UpdateAssignorService {
   constructor(private assignorRepository: AssignorRepository) {}
 

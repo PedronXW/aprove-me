@@ -1,5 +1,6 @@
 import { Either, left, right } from '@/@shared/either'
 import { Assignor } from '@/domain/enterprise/entities/assignor'
+import { Injectable } from '@nestjs/common'
 import { AssignorNonExistsError } from '../../errors/AssignorNonExistsError'
 import { AssignorRepository } from '../../repositories/assignor-repository'
 
@@ -10,6 +11,7 @@ type FindAssignorByIdServiceRequest = {
 
 type FindAssignorByIdServiceResponse = Either<AssignorNonExistsError, Assignor>
 
+@Injectable()
 export class FindAssignorByIdService {
   constructor(private assignorRepository: AssignorRepository) {}
 

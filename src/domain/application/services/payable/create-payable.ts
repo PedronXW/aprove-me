@@ -12,7 +12,6 @@ import { UserRepository } from '../../repositories/user-repository'
 
 export type CreatePayableServiceRequest = {
   value: number
-  emissionDate: Date
   assignorId: string
   receiverId: string
 }
@@ -35,7 +34,6 @@ export class CreatePayableService {
 
   async execute({
     value,
-    emissionDate,
     assignorId,
     receiverId,
   }: CreatePayableServiceRequest): Promise<CreatePayableServiceResponse> {
@@ -64,7 +62,6 @@ export class CreatePayableService {
 
     const payable = Payable.create({
       value,
-      emissionDate,
       assignorId: new EntityId(assignorId),
       receiverId: new EntityId(receiverId),
     })

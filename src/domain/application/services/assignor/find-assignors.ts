@@ -1,4 +1,5 @@
 import { Either, left, right } from '@/@shared/either'
+import { Injectable } from '@nestjs/common'
 import { PaginationError } from '../../errors/PaginationError'
 import {
   AssignorRepository,
@@ -16,6 +17,7 @@ type FindAssignorsServiceResponse = Either<
   FindAssignorsResponse
 >
 
+@Injectable()
 export class FindAssignorsService {
   constructor(private assignorRepository: AssignorRepository) {}
 

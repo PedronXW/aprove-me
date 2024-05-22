@@ -1,4 +1,5 @@
 import { Either, left, right } from '@/@shared/either'
+import { Injectable } from '@nestjs/common'
 import { InactivePayableError } from '../../errors/InactivePayableError'
 import { PayableNonExistsError } from '../../errors/PayableNonExists'
 import { PayableRepository } from '../../repositories/payable-repository'
@@ -13,6 +14,7 @@ type DeletePayableServiceResponse = Either<
   boolean
 >
 
+@Injectable()
 export class DeletePayableService {
   constructor(private payableRepository: PayableRepository) {}
 

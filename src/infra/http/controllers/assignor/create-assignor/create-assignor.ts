@@ -1,7 +1,6 @@
 import { CreateAssignorService } from '@/domain/application/services/assignor/create-assignor'
 import { CurrentUser } from '@/infra/auth/current-user-decorator'
 import { UserPayload } from '@/infra/auth/jwt-strategy'
-import { Public } from '@/infra/auth/public'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation-pipe'
 import { AssignorPresenter } from '@/infra/http/presenters/presenter-assignor'
 import { BadRequestException, Body, Controller, Post } from '@nestjs/common'
@@ -18,7 +17,6 @@ export type CreateAssignorDTO = z.infer<typeof createAssignorDTO>
 
 const bodyValidation = new ZodValidationPipe(createAssignorDTO)
 
-@Public()
 @Controller('/assignors')
 export class CreateAssignorController {
   constructor(private createAssignorService: CreateAssignorService) {}
