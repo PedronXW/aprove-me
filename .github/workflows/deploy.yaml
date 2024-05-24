@@ -1,8 +1,8 @@
 name: ci-aproveme-workflow
 on: 
-    pull_request:
+    push:
         branches:
-            - development
+            - main
 
 env:
     NODE_ENV: ${{ secrets.NODE_ENV }}
