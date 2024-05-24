@@ -1,0 +1,53 @@
+version: '3.9'
+
+services:
+
+  aprove-me-back:
+    build: ./back-end
+    container_name: aprove-me-back
+    restart: always
+    entrypoint: sleep infinity
+    ports: 
+      - 3333:3333
+    depends_on:
+      - redis
+      - rabbitmq
+    links:
+      - redis
+      - rabbitmq
+    environment:
+      JWT_SECRET: secret
+      DATABASE_URL: file:./dev.db
+      REDIS_URL: redis://redis:6379
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      EMAIL_USERNAME: 7c120fba39e28b
+      EMAIL_PASSWORD: 80ac73b879dcf6
+      EMAIL_PORT: 2525
+      EMAIL_HOST: sandbox.smtp.mailtrap.io
+    volumes:
+      - ./back-end:/app
+
+
+  redis:
+    container_name: redis
+    image: redis
+    ports:
+      - 6379:6379
+    volumes:
+      - ./back-end/data/redis:/data/redis
+
+
+  rabbitmq:
+    image: rabbitmq:3.6.6-management
+    container_name: rabbitmq
+    ports: 
+      - 25672:25672
+      - 15672:15672
+      - 5672:5672
+    volumes:
+      - ./rabbitmq/docker_conf/rabbitmq/data/:/var/lib/rabbitmq/
+    environment:
+      - RABBITMQ_DEFAULT_USER = admin
+      - RABBITMQ_DEFAULT_PASS = passw123
+    restart: always
