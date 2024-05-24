@@ -4,7 +4,6 @@ on:
         branches:
             - main
 
-
 jobs:
     check-application:
         strategy:
@@ -44,8 +43,6 @@ jobs:
         needs: check-application
         runs-on: self-hosted
         steps:
-            - name: Checkout
-              run: ls
             - name: Docker Compose
-              run: docker-compose up -d
+              run: cd .. && docker-compose up -d
               
