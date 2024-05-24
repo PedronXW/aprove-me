@@ -43,7 +43,33 @@ jobs:
         needs: check-application
         runs-on: self-hosted
         steps:
-            - name: Deploy application
-              run: |
-                docker-compose -f docker-compose.yml up -d
+            - name: Stop and remove container
+              run: docker stop aproveme-back && docker rm aproveme-back || true
+
+            - name: Pull image
+              run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/aproveme-back:latest
+
+            - name: Run redis container
+              run: docker run -d -p 6379:6379 --name redis redis \ 
+                --network=host \ 
+                -v ./back-end/data/redis:/data/redis
+
+            - name: Run rabbitmq container
+              run: docker run -d -p 25672:25672 -p 15672:15672 -p 5672:5672 --name rabbitmq rabbitmq:3.6.6-management \ 
+                --network=host
+
+            - name: Run container
+              run: docker run -d -p 3000:3000 --name aproveme-back ${{ secrets.DOCKERHUB_USERNAME }}/aproveme-back:latest \ 
+                --restart=always --network=host \ 
+                -e JWT_SECRET=secret \
+                -e DATABASE_URL=file:./dev.db \
+                -e REDIS_URL=redis://redis:6379 \
+                -e REDIS_HOST=redis \
+                -e REDIS_PORT=6379 \
+                -e EMAIL_USERNAME=7c120fba39e28b \
+                -e EMAIL_PASSWORD=80ac73b879dcf6 \
+                -e EMAIL_PORT=2525 \
+                -e EMAIL_HOST=sandbox.smtp.mailtrap.io \
+                -v ./back-end:/app
+
               
