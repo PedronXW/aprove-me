@@ -1,7 +1,7 @@
 FROM node:19-slim
 USER root
 WORKDIR /app
-COPY package.json .
+COPY /app/package.json .
 RUN npm install --force
 RUN apt-get update && apt-get install -y procps && rm -rf /var/lib/apt/lists/*
 COPY . .
