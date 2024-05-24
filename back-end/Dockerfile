@@ -4,7 +4,7 @@ USER root
 
 WORKDIR /app
 
-COPY . .
+COPY . ./app
 
 RUN npm install --force
 
