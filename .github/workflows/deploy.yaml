@@ -43,6 +43,7 @@ jobs:
         needs: check-application
         runs-on: self-hosted
         steps:
-            - name: Docker Compose
-              run: cd .. && docker-compose up -d
+            - name: Deploy application
+              run: |
+                docker-compose -f docker-compose.yml up -d
               
