@@ -2,9 +2,9 @@ FROM node:19-slim
 
 WORKDIR /app
 
-COPY . .
-
 RUN chown -R app /app
+
+COPY . .
 
 RUN npm install --force
 
