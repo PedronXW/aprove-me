@@ -25,6 +25,8 @@ services:
       EMAIL_PASSWORD: 80ac73b879dcf6
       EMAIL_PORT: 2525
       EMAIL_HOST: sandbox.smtp.mailtrap.io
+    volumes:
+      - ./back-end:/app
 
 
   redis:
