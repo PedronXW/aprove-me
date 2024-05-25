@@ -43,6 +43,10 @@ jobs:
         needs: check-application
         runs-on: self-hosted
         steps:
+
+            - name: Install Docker
+              run: sudo apt-get update && sudo snap install docker
+
             - name: Stop and remove container
               continue-on-error: true
               run: sudo docker stop aproveme-back && sudo docker rm aproveme-back && sudo docker rmi aproveme-back
