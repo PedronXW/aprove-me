@@ -47,9 +47,6 @@ jobs:
               continue-on-error: true
               run: sudo docker stop aproveme-back && sudo docker rm aproveme-back && sudo docker rmi aproveme-back
 
-            - name: Pull image
-              run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/aproveme-back:latest
-
             - name: Create network
               run: sudo docker network create aproveme-network || true
 
