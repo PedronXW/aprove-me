@@ -45,6 +45,7 @@ jobs:
         steps:
 
             - name: Install Docker
+              continue-on-error: true
               run: sudo apt-get update && sudo snap install docker
 
             - name: Stop and remove container
