@@ -54,7 +54,6 @@ jobs:
               continue-on-error: true
               run: sudo docker run -d -p 6379:6379 --name redis redis \ 
                 --network aproveme-network \
-                -v ./back-end/data/redis:/data/redis
 
             - name: Run rabbitmq container
               continue-on-error: true
@@ -73,6 +72,5 @@ jobs:
                 -e EMAIL_PASSWORD=80ac73b879dcf6 \
                 -e EMAIL_PORT=2525 \
                 -e EMAIL_HOST=sandbox.smtp.mailtrap.io \
-                -v ./back-end:/app
 
               
