@@ -44,21 +44,28 @@ jobs:
         runs-on: self-hosted
         steps:
             - name: Stop and remove container
-              run: docker stop aproveme-back && docker rm aproveme-back || true
+              run: docker stop aproveme-back && docker rm aproveme-back && docker rmi aproveme-back || true
 
             - name: Pull image
               run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/aproveme-back:latest
 
+            - name: Create network
+              run: sudo docker network create aproveme-network || true
+
             - name: Run redis container
+              continue-on-error: true
               run: sudo docker run -d -p 6379:6379 --name redis redis \ 
+                --network aproveme-network \
                 -v ./back-end/data/redis:/data/redis
 
             - name: Run rabbitmq container
-              run: sudo docker run -d -p 25672:25672 -p 15672:15672 -p 5672:5672 --name rabbitmq rabbitmq:3.6.6-management 
+              continue-on-error: true
+              run: sudo docker run -d -p 25672:25672 -p 15672:15672 -p 5672:5672 --name rabbitmq rabbitmq:3.6.6-management --network aproveme-network
 
             - name: Run container
               run: sudo docker run -d -p 3333:3333 --name aproveme-back ${{ secrets.DOCKERHUB_USERNAME }}/aproveme-back:latest \ 
                 --restart=always \ 
+                --network aproveme-network \
                 -e JWT_SECRET=secret \
                 -e DATABASE_URL=file:./dev.db \
                 -e REDIS_URL=redis://redis:6379 \
