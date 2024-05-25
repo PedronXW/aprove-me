@@ -48,7 +48,7 @@ jobs:
               run: sudo docker stop aproveme-back && sudo docker rm aproveme-back && sudo docker rmi aproveme-back
 
             - name: Create network
-              run: sudo docker network create aproveme-network || true
+              run: sudo docker network create aproveme-network
 
             - name: Run redis container
               continue-on-error: true
