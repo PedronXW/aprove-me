@@ -7,7 +7,6 @@ export const envSchema = z.object({
   PORT: z.coerce.number().default(3333),
   JWT_SECRET: z.string(),
   DATABASE_URL: z.string(),
-  RESET_PASSWORD_SECRET: z.string(),
   REDIS_HOST: z.string().optional().default('redis'),
   EMAIL_USERNAME: z.string(),
   EMAIL_PASSWORD: z.string(),
