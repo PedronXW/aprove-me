@@ -1,7 +1,7 @@
 import { MailRepository } from '@/domain/application/mail/mail-repository'
 import { MailerModule } from '@nestjs-modules/mailer'
 import { Module } from '@nestjs/common'
-import { MailService } from './mail-service'
+import { MailService } from '../../domain/application/services/mail/mail-service'
 import { NodemailerMailRepository } from './nodemailer-mail-repository'
 
 @Module({

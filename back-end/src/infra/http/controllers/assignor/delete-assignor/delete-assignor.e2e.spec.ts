@@ -69,11 +69,10 @@ describe('Delete Assignor', () => {
       .send()
 
     expect(responseDeleteAssignor.status).toBe(204)
-    expect(responseFindAssignor.status).toBe(400)
+    expect(responseFindAssignor.status).toBe(403)
     expect(responseFindAssignor.body).toEqual({
       message: 'Assignor non exists',
-      error: 'Bad Request',
-      statusCode: 400,
+      statusCode: 403,
     })
   })
 })

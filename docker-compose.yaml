@@ -28,6 +28,16 @@ services:
     volumes:
       - ./back-end:/app
 
+  aprove-me-front:
+    build: ./front-end
+    container_name: aprove-me-front
+    restart: always
+    entrypoint: sleep infinity
+    ports: 
+      - 3000:3000
+    volumes:
+      - ./front-end:/app
+
 
   redis:
     container_name: redis

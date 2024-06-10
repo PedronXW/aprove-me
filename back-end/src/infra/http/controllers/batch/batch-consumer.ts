@@ -1,7 +1,7 @@
 import { BrokerRepository } from '@/domain/application/broker/broker-repository'
 import { CacheRepository } from '@/domain/application/cache/cache-repository'
+import { MailService } from '@/domain/application/services/mail/mail-service'
 import { CreatePayableService } from '@/domain/application/services/payable/create-payable'
-import { MailService } from '@/infra/mail/mail-service'
 import { Controller } from '@nestjs/common'
 import { Ctx, MessagePattern, Payload, RmqContext } from '@nestjs/microservices'
 
@@ -24,7 +24,6 @@ export class BatchConsumerController {
       const successCount = await this.cacheRepository.get(
         'payable:batch:' + data.batchId,
       )
-      console.log('successCount', successCount)
       this.mailService.execute({
         mailType: 'QUEUE_RESULT',
         to: 'operationteam@aprove.me',
@@ -39,7 +38,6 @@ export class BatchConsumerController {
       return
     }
 
-    console.log('QUEUE - ' + payload)
     const result = await this.createPayableService.execute(data)
 
     if (result.isLeft()) {

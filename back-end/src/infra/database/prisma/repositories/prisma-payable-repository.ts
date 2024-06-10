@@ -53,6 +53,9 @@ export class PrismaPayableRepository implements PayableRepository {
     limit: number,
   ): Promise<FindPayablesResponse> {
     const payables = await this.prisma.payable.findMany({
+      where: {
+        active: true,
+      },
       take: limit * 1,
       skip: (page - 1) * limit,
     })

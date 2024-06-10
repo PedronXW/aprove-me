@@ -1,7 +1,7 @@
 import { BrokerRepository } from '@/domain/application/broker/broker-repository'
 import { Inject, Injectable } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
-import { MailService } from '../mail/mail-service'
+import { MailService } from '../../domain/application/services/mail/mail-service'
 
 @Injectable()
 export class RabbitmqRepository implements BrokerRepository {

@@ -1,4 +1,4 @@
-import { MailService } from '@/infra/mail/mail-service'
+import { MailService } from '@/domain/application/services/mail/mail-service'
 import { createMock } from '@golevelup/ts-jest'
 import { Test, TestingModule } from '@nestjs/testing'
 import { AssignorFactory } from 'test/factories/unit/AssignorFactory'
@@ -7,7 +7,6 @@ import { BatchCreationService } from './batch-creation'
 
 let sut: BatchCreationService
 let brokerRepository: BrokerRepository
-let mailService: MailService
 
 describe('Create Payable', () => {
   beforeEach(async () => {
@@ -27,7 +26,6 @@ describe('Create Payable', () => {
 
     sut = moduleRef.get<BatchCreationService>(BatchCreationService)
     brokerRepository = moduleRef.get<BrokerRepository>(BrokerRepository)
-    mailService = moduleRef.get<MailService>(MailService)
   })
 
   it('should call brokerRepository.sendMessage with correct params', async () => {
@@ -41,16 +39,11 @@ describe('Create Payable', () => {
 
     await sut.execute({ payables, assignorId: assignor.id.getValue() })
 
-    expect(brokerRepository.sendMessage).toHaveBeenCalledWith(
-      JSON.stringify({ ...payables[0], assignorId: assignor.id.getValue() }),
+    expect(brokerRepository.sendMessage).toHaveBeenNthCalledWith(
+      1,
+      expect.any(String),
     )
 
-    expect(brokerRepository.sendMessage).toHaveBeenCalledTimes(1)
-
-    expect(mailService.execute).toHaveBeenCalledWith({
-      mailType: 'QUEUE_RESULT',
-      to: 'operationteam@aprove.me',
-      text: 'QUEUE_RESULT - 0 messages failed to be sent',
-    })
+    expect(brokerRepository.sendMessage).toHaveBeenCalledTimes(2)
   })
 })

@@ -49,6 +49,7 @@ describe('Update Payable', () => {
       .set('Authorization', `Bearer ${body.token}`)
       .send({
         value: 2000,
+        emissionDate: new Date(),
       })
 
     expect(responseSearch.status).toBe(200)

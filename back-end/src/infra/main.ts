@@ -11,6 +11,8 @@ async function bootstrap() {
   app.use(json({ limit: '50mb' }))
   app.use(urlencoded({ extended: true, limit: '50mb' }))
 
+  app.enableCors()
+
   const envService = app.get(EnvService)
 
   const port = envService.get('PORT')
@@ -44,10 +46,12 @@ async function bootstrap() {
   })
 
   const config = new DocumentBuilder()
-    .setTitle('Cats example')
-    .setDescription('The cats API description')
+    .setTitle('Aprove-me')
+    .setDescription('The Aprove-me API description')
     .setVersion('1.0')
-    .addTag('cats')
+    .addTag('assignor')
+    .addTag('session')
+    .addTag('payable')
     .build()
   const document = SwaggerModule.createDocument(app, config)
   SwaggerModule.setup('docs', app, document)

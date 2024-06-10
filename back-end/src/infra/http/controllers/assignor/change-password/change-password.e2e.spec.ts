@@ -101,11 +101,10 @@ describe('Change Password', () => {
         newPassword: '123456789',
       })
 
-    expect(responseUpdate.status).toBe(400)
+    expect(responseUpdate.status).toBe(401)
     expect(responseUpdate.body).toEqual({
-      error: 'Bad Request',
       message: 'Wrong credentials',
-      statusCode: 400,
+      statusCode: 401,
     })
   })
 })
