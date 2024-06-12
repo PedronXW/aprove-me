@@ -12,7 +12,8 @@ Toda a aplicação é desenvolvida em containers, e esses são administrados com
 
 - Com um terminal aberto na página raiz do projeto, execute o comando "docker compose up -d" e espere os containers ficarem disponíveis.
 - Entre na pasta "back-end" e instale as dependencias com o comando "npm install".
-- Após o primeiro passo, entre no container da aplicação, com o comando "docker compose exec aprove-me-back sh".
+- A seguir, configure o banco de dados com o comando "npx prisma migrate dev".
+- Após os primeiros passos, entre no container da aplicação, com o comando "docker compose exec aprove-me-back sh".
 - Com os dois passos anteriores cumpridos, poderemos utilizar a aplicação. Se quisermos executar os testes, podemos utilizar o comando "npm run test-e2e" ou "npm run test-unit", dependendo do tipo de testes que você quer executar.
 - Se quiser iniciar a aplicação em produção execute os comandos "npm run build" e em seguida o comando "npm run start".
 - Se quiser iniciar a aplicação em desenvolvimento execute o comando "npm run start:dev".
