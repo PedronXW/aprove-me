@@ -8,13 +8,23 @@ Como padrões arquiteturais foram adotadas estratégias como DDD, Clean Architec
 
 Toda a aplicação é desenvolvida em containers, e esses são administrados com Docker compose, então para iniciar corretamente a aplicação é necessário que todos os containers estejam em operação.
 
-### Como iniciar a aplicação:
+### Como iniciar o back-end da aplicação:
 
 - Com um terminal aberto na página raiz do projeto, execute o comando "docker compose up -d" e espere os containers ficarem disponíveis.
-- Após o primeiro passo, entre no container da aplicação, com o comando "docker compose exec qea sh".
+- Entre na pasta "back-end" e instale as dependencias com o comando "npm install".
+- Após o primeiro passo, entre no container da aplicação, com o comando "docker compose exec aprove-me-back sh".
 - Com os dois passos anteriores cumpridos, poderemos utilizar a aplicação. Se quisermos executar os testes, podemos utilizar o comando "npm run test-e2e" ou "npm run test-unit", dependendo do tipo de testes que você quer executar.
 - Se quiser iniciar a aplicação em produção execute os comandos "npm run build" e em seguida o comando "npm run start".
 - Se quiser iniciar a aplicação em desenvolvimento execute o comando "npm run start:dev".
+- A aplicação é executada na porta 3333 e na porta 3000, assim como o Redis na porta 6379 e o RabbitMQ na porta 5672 então tome cuidado para não possuir outras ferramentas em execução nestas portas.
+
+### Como iniciar o front-end da aplicação:
+
+- Com um terminal aberto na página raiz do projeto, execute o comando "docker compose up -d" e espere os containers ficarem disponíveis.
+- Entre na pasta "front-end" e instale as dependencias com o comando "npm install".
+- Após o primeiro passo, entre no container da aplicação, com o comando "docker compose exec aprove-me-front sh".
+- Se quiser iniciar a aplicação em produção execute os comandos "npm run build" e em seguida o comando "npm run start".
+- Se quiser iniciar a aplicação em desenvolvimento execute o comando "npm run dev".
 - A aplicação é executada na porta 3333 e na porta 3000, assim como o Redis na porta 6379 e o RabbitMQ na porta 5672 então tome cuidado para não possuir outras ferramentas em execução nestas portas.
 
 ## Documentação de Endpoints - Backend
