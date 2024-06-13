@@ -19,9 +19,9 @@ export class PrismaPayableRepository implements PayableRepository {
     return PayableMapper.toDomain(createdPayable)
   }
 
-  async findPayableById(id: string): Promise<Payable> {
+  async findPayableById(id: string, assignorId: string): Promise<Payable> {
     const payable = await this.prisma.payable.findFirst({
-      where: { id },
+      where: { id, assignorId },
     })
 
     if (!payable) {
