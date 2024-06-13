@@ -72,8 +72,7 @@ describe('Change Password', () => {
 
     expect(responseUpdate.status).toBe(400)
     expect(responseUpdate.body).toEqual({
-      errors: { name: 'ZodValidationError', details: expect.any(Object) },
-      message: 'Validation failed',
+      message: 'String must contain at least 8 character(s) in password',
       statusCode: 400,
     })
   })
