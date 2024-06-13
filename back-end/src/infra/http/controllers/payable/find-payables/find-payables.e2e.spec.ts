@@ -41,7 +41,7 @@ describe('FindPayables', () => {
       .set('Authorization', `Bearer ${body.token}`)
       .send({
         value: 1000,
-        emissionDate: new Date(),
+        emissionDate: '2024-06-13T18:26:50.421Z',
       })
 
     const responseSearch = await request(app.getHttpServer())

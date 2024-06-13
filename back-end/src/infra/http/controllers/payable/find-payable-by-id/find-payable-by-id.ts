@@ -38,7 +38,7 @@ export class FindPayableByIdController {
           properties: {
             id: { type: 'string', format: 'uuid' },
             value: { type: 'number' },
-            emissionDate: { type: 'date string' },
+            emissionDate: { type: 'string', format: 'date-time' },
             status: { type: 'string' },
           },
         },

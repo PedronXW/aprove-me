@@ -13,7 +13,7 @@ const batchInsertionDTO = z.object({
         value: z.number(),
         emissionDate: z
           .string()
-          .date()
+          .datetime()
           .transform((value) => new Date(value)),
       }),
     )

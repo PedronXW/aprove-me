@@ -9,6 +9,7 @@ import { Body, Controller, HttpException, Param, Patch } from '@nestjs/common'
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiBody,
   ApiForbiddenResponse,
   ApiOkResponse,
   ApiTags,
@@ -18,7 +19,7 @@ import { z } from 'zod'
 
 const updatePayableDTO = z.object({
   value: z.number().optional(),
-  emissionDate: z.string(),
+  emissionDate: z.string().datetime(),
 })
 
 export type UpdatePayableDTO = z.infer<typeof updatePayableDTO>
@@ -30,6 +31,20 @@ const bodyValidation = new ZodValidationPipe(updatePayableDTO)
 export class UpdatePayableController {
   constructor(private updatePayableService: UpdatePayableService) {}
 
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        value: { type: 'number' },
+        emissionDate: { type: 'string', format: 'date-time' },
+      },
+      example: {
+        value: 1000,
+        emissionDate: '2024-06-13T18:26:50.421Z',
+      },
+      description: 'Value and emission date',
+    },
+  })
   @ApiOkResponse({
     description: 'Assignor updated',
     status: 200,
@@ -41,7 +56,7 @@ export class UpdatePayableController {
           properties: {
             id: { type: 'string', format: 'uuid' },
             value: { type: 'number' },
-            emissionDate: { type: 'date string' },
+            emissionDate: { type: 'string', format: 'date-time' },
             status: { type: 'string' },
           },
         },

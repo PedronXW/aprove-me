@@ -20,7 +20,7 @@ import { z } from 'zod'
 
 const createPayableDTO = z.object({
   value: z.number(),
-  emissionDate: z.string().date(),
+  emissionDate: z.string().datetime(),
 })
 
 export type CreatePayableDTO = z.infer<typeof createPayableDTO>
@@ -41,7 +41,7 @@ export class CreatePayableController {
       },
       example: {
         value: 1000,
-        emissionDate: '2021-10-10',
+        emissionDate: '2024-06-13T18:26:50.421Z',
       },
       required: ['value', 'emissionDate'],
       description: 'Value and emission date',
