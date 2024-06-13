@@ -51,16 +51,23 @@ export class PrismaPayableRepository implements PayableRepository {
   async findPayables(
     page: number,
     limit: number,
+    assignorId: string,
   ): Promise<FindPayablesResponse> {
     const payables = await this.prisma.payable.findMany({
       where: {
         active: true,
+        assignorId,
       },
       take: limit * 1,
       skip: (page - 1) * limit,
     })
 
-    const total = await this.prisma.payable.count()
+    const total = await this.prisma.payable.count({
+      where: {
+        active: true,
+        assignorId,
+      },
+    })
 
     return {
       payables: payables.map(PayableMapper.toDomain),
