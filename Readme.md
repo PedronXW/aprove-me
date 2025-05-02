@@ -1,3 +1,5 @@
+#EM DESENVOLVIMENTO
+
 # Gerenciamento de Pagáveis.
 
 Esta aplicação é uma API desenvolvida com NodeJS, utilizando Typescript e o framework Nest, ela tem por objetivo implementar um sistema de cadastro de recebíveis para clientes de algum banco, com autenticação de seus usuários. Além dos elementos já citados ela também utiliza de bancos de dados SQLite, gerenciado pela aplicação com a utilização de um ORM chamado Prisma, assim como a utilização de Redis usado para realizar a contagem de cadastros com sucesso na inserção múltipla.
